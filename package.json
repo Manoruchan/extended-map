@@ -1,0 +1,35 @@
+{
+  "name": "@manoruchan/extented-map",
+  "version": "1.0.0",
+  "description": "An extended Map for TypeScript with Java-style utility methods.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Manoruchan/extented-map.git"
+  },
+  "keywords": [
+    "typescript",
+    "extended",
+    "map",
+    "utility",
+    "collection",
+    "hashmap"
+  ],
+  "author": "Manoruchan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Manoruchan/extented-map/issues"
+  },
+  "homepage": "https://github.com/Manoruchan/extented-map#readme",
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "^5.8.3"
+  }
+}
