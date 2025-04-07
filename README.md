@@ -1,4 +1,4 @@
-# extented-map
+# extended-map
 
 A  `Map` extension for TypeScript, inspired by Java's `HashMap` utility methods.
 
