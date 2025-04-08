@@ -111,7 +111,7 @@ Returns another Map or ExtMap.
 
 Attemps to put the value if the value is not already existing.
 If `null` is mapped as a value, recognize it as absent.
-The new value if set, the existing value if present, or `null` if `null` was previously associated.
+Returns the new value if set, the existing value if present, or `null` if `null` was previously associated.
 
 
 `sweep(fn: (value: V, key: K, map: this) => boolean): V[];`
