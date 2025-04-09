@@ -4,6 +4,8 @@ A  `Map` extension for TypeScript, inspired by Java's `HashMap` utility methods.
 
 Use familiar `Map` APIs enhanced with powerful, type-safe methods like `computeIfAbsent`, `merge`, `getOrDefault`, and more.
 
+npm: [`@manoruchan/extended-map`](https://www.npmjs.com/package/@manoruchan/extended-map)
+
 
 ## Features
 
@@ -85,7 +87,7 @@ Checks whether this map is empty, or not.
 
 `keysArray(): K[];`
 
-Obtains an array of keys.
+Returns an array of keys.
 
 `map<U>(fn: (value: V, key: K, map: this) => U): U[];`
 
@@ -109,7 +111,7 @@ Returns another Map or ExtMap.
 
 `setIfAbsent(key: K, value: V): V | null;`
 
-Attemps to put the value if the value is not already existing.
+Attempts to put the value if the value is not already existing.
 If `null` is mapped as a value, recognize it as absent.
 Returns the new value if set, the existing value if present, or `null` if `null` was previously associated.
 
@@ -120,12 +122,12 @@ Removes all specified values. Returns removed values.
 
 `toArray(): [K, V][];`
 
-Obtains an array of entries.
+Returns an array of entries.
 
 `valuesArray(): V[];`
 
-Obtains an array of values.
+Returns an array of values.
 
 
 ## License
-[MIT](https://github.com/Manoruchan/extented-map/blob/main/LICENSE)
+[MIT](https://github.com/Manoruchan/extended-map/blob/main/LICENSE)
