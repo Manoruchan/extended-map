@@ -107,8 +107,7 @@ export class ExtMap<K, V> extends Map<K, V> {
      * @returns The value associated with key, or `defaultValue`.
      */
     getOrDefault(key: K, defaultValue: V): V {
-        const value = super.get(key);
-        return value !== undefined && value !== null ? value : defaultValue;
+        return super.get(key) ?? defaultValue;
     }
 
     /**
