@@ -13,7 +13,7 @@ export class ExtMap<K, V> extends Map<K, V> {
      * Creates a shallow copy of the map.
      */
     clone(): ExtMap<K, V> {
-        return new ExtMap<K, V>(this.toArray());
+        return new ExtMap<K, V>([...this]);
     }
 
     /**
