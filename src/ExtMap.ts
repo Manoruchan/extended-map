@@ -77,8 +77,8 @@ export class ExtMap<K, V> extends Map<K, V> {
      * @param fn - A function that determines whether an entry should be included in the result.
      * @returns The ExtMap which contains filtered values.
      */
-    filter(fn: (value: V, key: K, map: this) => boolean): this {
-        const result = new (this.constructor as new () => this);
+    filter(fn: (value: V, key: K, map: this) => boolean): ExtMap<K, V> {
+        const result = new ExtMap<K, V>();
         for (const [k, v] of this) {
             if (fn(v, k, this)) result.set(k, v);
         }
