@@ -1,6 +1,8 @@
 /**
  * An extended Map for TypeScript with Java-style utility methods.
  *
+ * @deprecated EnMap is now available as next ExtMap
+ *
  * @typeParam K - The key type of this map.
  * @typeParam V - The value type of this map.
  */
