@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { ExtMap } from "../dist/ExtMap.js";
+import { ExtMap } from "../src/ExtMap";
 
 const map = new ExtMap<string, number>();
 
