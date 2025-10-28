@@ -100,7 +100,7 @@ export class EnMap<K, V> extends Map<K, V> {
             return super.delete(key);
         } else {
             const currentValue = this.get(key);
-            if (currentValue !== undefined && currentValue === value) {
+            if (!__isNullish(currentValue) && currentValue === value) {
                 return super.delete(key);
             }
         }
@@ -193,6 +193,7 @@ export class EnMap<K, V> extends Map<K, V> {
 
     /**
      * Alias for `.has()`
+     *
      * @returns A boolean indicating whether the key exists or not.
      */
     public hasKey(key: K): boolean {
@@ -202,10 +203,12 @@ export class EnMap<K, V> extends Map<K, V> {
     /**
      * Obtains a value by the key,
      * or returns `defaultValue` if the key is not exist.
+     *
      * @returns The value associated with key, or `defaultValue`.
      */
     public getOrDefault(key: K, defaultValue: V): V {
         const value = this.get(key);
+        // Only treat `undefined` as absent. `null` is considered an existing value.
         return value === undefined ? defaultValue : value;
     }
 
