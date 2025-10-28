@@ -15,7 +15,8 @@ npm: [`@manoruchan/extended-map`](https://www.npmjs.com/package/@manoruchan/exte
       (`compute`, `computeIfPresent`, `computeIfAbsent`, `merge`)
 
 2. **Nullish value handling**
-    - Treats both `undefined` (returned by `Map.get(key)`) and `null` as **lack of value** in almost operations.
+    - Treats both `undefined` (returned by `Map.get(key)`) and `null` as **lack of value** in most operations
+      `null` can exist, but is considered *absent when acted upon*.
       The entry will be removed if `compute` or `merge` returns `null` or `undefined`.
 3. **Utility methods**
     - Provides convenient array-like utilities such as `filter`, `sweep`, `keysArray`, and `valuesArray`.
@@ -73,7 +74,7 @@ if (pingCooldown !== undefined) {
 ```
 
 2. `merge`
-Merges old value and new value, set a new value if the key is not exists.
+Merges the old and new values, or sets a new one if the key does not exist.
 
 Example
 ```ts
@@ -123,12 +124,13 @@ console.log(items.has("mana_potion")); // false
 
 `delete(key, value?): boolean` — Deletes the entry if key and value matched.
 
-`getOrDefault(key, defaultValue): V` — Returns `defaultValue`if the key is not exist. If the value is `null`, returns `null`.
+`getOrDefault(key, defaultValue): V` — Returns `defaultValue` if the key does not exist. If the value is `null`, returns `null`.
 
 `sweep(fn): V[]` — Deletes all entries satisfies condition and returns an array of removed values.
 
 ## Optional Type
 ```ts
+// Used internally to represent values that may be missing or nullish.
 export type Optional<Type> = Type | undefined | null;
 ```
 
