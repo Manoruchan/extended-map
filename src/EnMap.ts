@@ -284,11 +284,7 @@ export class EnMap<K, V> extends Map<K, V> {
     public setAll(map: ReadonlyMap<K, V>, override: boolean): this;
     public setAll(map: ReadonlyMap<K, V>, override: boolean = true): this {
         for (const [k, v] of map) {
-            if (!override) {
-                if (!this.has(k)) {
-                    this.set(k, v);
-                }
-            } else {
+            if (override || !this.has(k)) {
                 this.set(k, v);
             }
         }
