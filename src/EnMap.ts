@@ -64,7 +64,7 @@ export class EnMap<K, V> extends Map<K, V> {
      *
      * @param key The key to compute the value.
      * @param fn A function that try to remap the key and value.
-     * @returns The computed value, or ``
+     * @returns The computed value, or `undefined` if the key was not present or removed.
      */
     public computeIfPresent(key: K, fn: (key: K, oldValue: V) => Optional<V>): Optional<V> {
         const oldValue = this.get(key);
