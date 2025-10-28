@@ -2,15 +2,32 @@ export type Optional<Type> = Type | undefined | null;
 
 const __isNullish = (v: unknown) => v === undefined || v === null;
 
+/**
+ * An enhanced Map for TypeScript with Java-style utility methods.
+ *
+ * @typeParam K - The key type of this map.
+ * @typeParam V - The value type of this map.
+ */
 export class EnMap<K, V> extends Map<K, V> {
     constructor(args: ReadonlyArray<[K, V]> = []) {
         super(args as [K, V][]);
     }
 
+    /**
+     * @returns A shallow copy of the map.
+     */
     public clone(): EnMap<K, V> {
         return new EnMap<K, V>(this.toArray());
     }
 
+    /**
+     * Attemps to compute a value using the given mapping function to update entry in this map.
+     * Deletes the value associated with the given key if the mapping function returns `undefined` or `null`.
+     *
+     * @param key The key to compute the value.
+     * @param fn A functoin that try to map a key and value from the provided old value.
+     * @returns The computed new value, or `undefined` if removed.
+     */
     public compute(key: K, fn: (key: K, oldValue: Optional<V>) => Optional<V>): Optional<V> {
         const newValue = fn(key, this.get(key));
 
@@ -23,6 +40,13 @@ export class EnMap<K, V> extends Map<K, V> {
         return newValue;
     }
 
+    /**
+     * Attemps to compute a value using the given key to map a entry if the key is assignable (not already exist).
+     *
+     * @param key The key to compute the value with the key.
+     * @param fn A function that try to map a value into this map.
+     * @returns The existing or computed value associated with the specified key.
+     */
     public computeIfAbsent(key: K, fn: (key: K) => V): V {
         let value = this.get(key);
 
@@ -34,6 +58,14 @@ export class EnMap<K, V> extends Map<K, V> {
         return value;
     }
 
+    /**
+     * Attemps to compute a value using the given key to remap a entry if the key is already exist.
+     * Deletes the value associated with the given key if the remapping function returns `undefined` or `null`.
+     *
+     * @param key The key to compute the value.
+     * @param fn A function that try to remap the key and value.
+     * @returns The computed value, or ``
+     */
     public computeIfPresent(key: K, fn: (key: K, oldValue: V) => Optional<V>): Optional<V> {
         const oldValue = this.get(key);
 
@@ -52,7 +84,16 @@ export class EnMap<K, V> extends Map<K, V> {
         return undefined;
     }
 
+    /**
+     * @param key The key to delete.
+     */
     public override delete(key: K): boolean;
+    /**
+     * Deletes the key associated with the given value.
+     *
+     * @param key The key to delete.
+     * @param value The value to delete.
+     */
     public override delete(key: K, value: V): boolean;
     public override delete(key: K, value?: V): boolean {
         if (value === undefined) {
@@ -67,6 +108,10 @@ export class EnMap<K, V> extends Map<K, V> {
         return false;
     }
 
+    /**
+     * @param fn A function that determines whether an entry should be included in the result.
+     * @returns The EnMap which contains filtered entries.
+     */
     public filter(fn: (value: V, key: K, map: this) => boolean): EnMap<K, V> {
         const result = new EnMap<K, V>();
 
@@ -79,6 +124,12 @@ export class EnMap<K, V> extends Map<K, V> {
         return result;
     }
 
+    /**
+     * Finds the first value that satisfies the provided testing function.
+     *
+     * @param fn A function for searching.
+     * @returns The first value that satisfies the testing function, or `undefined` if not found.
+     */
     public find(fn: (value: V, key: K, map: this) => boolean): Optional<V> {
         for (const [k, v] of this) {
             if (fn(v, k, this)) {
@@ -89,6 +140,11 @@ export class EnMap<K, V> extends Map<K, V> {
         return undefined;
     }
 
+    /**
+     * Finds all values tha satisfies the provided testing function.
+     * @param fn A function for searching.
+     * @returns The array of values that satisfies the testing function.
+     */
     public findAll(fn: (value: V, key: K, map: this) => boolean): V[] {
         const result: V[] = [];
 
@@ -101,6 +157,12 @@ export class EnMap<K, V> extends Map<K, V> {
         return result;
     }
 
+    /**
+     * Finds the first key that satisfies the provided testing function.
+     *
+     * @param fn A tunction for searching.
+     * @returns The first key that satisfies the testing function, or `undefined` if not found.
+     */
     public findKey(fn: (value: V, key: K, map: this) => boolean): Optional<K> {
         for (const [k, v] of this) {
             if (fn(v, k, this)) {
@@ -111,6 +173,12 @@ export class EnMap<K, V> extends Map<K, V> {
         return undefined;
     }
 
+    /**
+     * Finds all values the satifies the provided testing function.
+     *
+     * @param fn A function for searching.
+     * @returns The array of keys that satisfites the testing function.
+     */
     public findKeyAll(fn: (value: V, key: K, map: this) => boolean): K[] {
         const result: K[] = [];
 
@@ -123,23 +191,43 @@ export class EnMap<K, V> extends Map<K, V> {
         return result;
     }
 
+    /**
+     * Alias for `.has()`
+     * @returns Boolean indicates whether the key is exist or not.
+     */
     public hasKey(key: K): boolean {
         return this.has(key);
     }
 
+    /**
+     * Obtains a value by the key,
+     * or returns `defaultValue` if the key is not exiting.
+     * @returns The value associated with key, or `defaultValue`.
+     */
     public getOrDefault(key: K, defaultValue: V): V {
         const value = this.get(key);
         return value === undefined ? defaultValue : value;
     }
 
+    /**
+     * @returns Boolean indicates whether this map is empty, or not.
+     */
     public isEmpty(): boolean {
         return this.size === 0;
     }
 
+    /**
+     * @returns An array of keys.
+     */
     public keysArray(): K[] {
         return [...this.keys()];
     }
 
+    /**
+     * Applies the function for each entries and returns an array.
+     *
+     * @returns An array contains the results of `fn` applied elements.
+     */
     public map<U>(fn: (value: V, key: K, map: this) => U): U[] {
         const result: U[] = [];
 
@@ -150,23 +238,49 @@ export class EnMap<K, V> extends Map<K, V> {
         return result;
     }
 
-    public merge(key: K, value: V, fn: (oldValue: V, newValue: V) => V): V {
+    /**
+     * Attempts to put the value according to provided remapping function.
+     *
+     * Removes the entry if the remapping function returns `null` or `undefined`.
+     *
+     * @param key The key to compute the value.
+     * @param value The args `newValue` in `fn`.
+     * @param fn A function that try to remap a value into this map.
+     * @returns The new value after merge, or `undefined` if the entry was deleted.
+     */
+    public merge(key: K, value: V, fn: (oldValue: V, newValue: V) => Optional<V>): Optional<V> {
         const oldValue = this.get(key);
 
         const newValue = !__isNullish(oldValue)
             ? fn(oldValue, value)
             : value;
 
-        this.set(key, newValue);
-        return newValue;
+        if (__isNullish(newValue)) {
+            this.delete(key);
+            return undefined;
+        } else {
+            this.set(key, newValue);
+            return newValue;
+        }
     }
 
+    /**
+     * Identical to `.set()` in native map, but returns `this` instead of `undefined`.
+     */
     public override set(key: K, value: V): this {
         super.set(key, value);
         return this;
     }
 
+    /**
+     * Adds all provided entries into this map.
+     */
     public setAll(map: ReadonlyMap<K, V>): this;
+    /**
+     * Adds all provided entries into this map.
+     * @param map
+     * @param override Whether override the key already exists.
+     */
     public setAll(map: ReadonlyMap<K, V>, override: boolean): this;
     public setAll(map: ReadonlyMap<K, V>, override: boolean = true): this {
         for (const [k, v] of map) {
@@ -182,6 +296,13 @@ export class EnMap<K, V> extends Map<K, V> {
         return this;
     }
 
+    /**
+     * Attempts to put the value if the value is not already existing.
+     *
+     * Recognize `null` value in this map as absent.
+     *
+     * @returns The new value if set, the existing value if present.
+     */
     public setIfAbsent(key: K, value: V): V {
         const currentValue = this.get(key);
 
@@ -193,7 +314,16 @@ export class EnMap<K, V> extends Map<K, V> {
         return currentValue;
     }
 
+    /**
+     * Replaces the value associated with the key.
+     * @param value New value.
+     * @returns Previous value.
+     */
     public replace(key: K, value: V): Optional<V>;
+    /**
+     * Replaces the value associated with the key.
+     * @returns Boolean indicates whether the entries was replaced, or not.
+     */
     public replace(key: K, oldValue: V, newValue: V): boolean;
     public replace(key: K, v1: V, v2?: V): Optional<V> | boolean {
         const oldValue = this.get(key);
@@ -211,6 +341,12 @@ export class EnMap<K, V> extends Map<K, V> {
         }
     }
 
+    /**
+     * Deletes all keys satisfies the provided function.
+     *
+     * @param fn A function that determines the condition to delete.
+     * @returns Removed values.
+     */
     public sweep(fn: (value: V, key: K, map: this) => boolean): V[] {
         const removed: V[] = [];
 
@@ -224,10 +360,16 @@ export class EnMap<K, V> extends Map<K, V> {
         return removed;
     }
 
+    /**
+     * @returns An array of entries.
+     */
     public toArray(): [K, V][] {
         return [...this];
     }
 
+    /**
+     * @returns An array of values.
+     */
     public valuesArray(): V[] {
         return [...this.values()];
     }
