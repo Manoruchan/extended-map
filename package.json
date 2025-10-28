@@ -1,6 +1,6 @@
 {
   "name": "@manoruchan/extended-map",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "An extended Map for TypeScript with Java-style utility methods.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
