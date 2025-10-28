@@ -21,11 +21,11 @@ export class EnMap<K, V> extends Map<K, V> {
     }
 
     /**
-     * Attemps to compute a value using the given mapping function to update entry in this map.
+     * Attempts to compute a value using the given mapping function to update entry in this map.
      * Deletes the value associated with the given key if the mapping function returns `undefined` or `null`.
      *
      * @param key The key to compute the value.
-     * @param fn A functoin that try to map a key and value from the provided old value.
+     * @param fn A function that tries to map a key and value from the provided old value.
      * @returns The computed new value, or `undefined` if removed.
      */
     public compute(key: K, fn: (key: K, oldValue: Optional<V>) => Optional<V>): Optional<V> {
@@ -41,10 +41,10 @@ export class EnMap<K, V> extends Map<K, V> {
     }
 
     /**
-     * Attemps to compute a value using the given key to map a entry if the key is assignable (not already exist).
+     * Attempts to compute a value using the given key to map a entry if the key is assignable (not already exist).
      *
      * @param key The key to compute the value with the key.
-     * @param fn A function that try to map a value into this map.
+     * @param fn A function that tries map a value to this map.
      * @returns The existing or computed value associated with the specified key.
      */
     public computeIfAbsent(key: K, fn: (key: K) => V): V {
@@ -59,11 +59,11 @@ export class EnMap<K, V> extends Map<K, V> {
     }
 
     /**
-     * Attemps to compute a value using the given key to remap a entry if the key is already exist.
+     * Attempts to compute a value using the given key to remap a entry if the key is already exist.
      * Deletes the value associated with the given key if the remapping function returns `undefined` or `null`.
      *
      * @param key The key to compute the value.
-     * @param fn A function that try to remap the key and value.
+     * @param fn A function that tries remap the key and value.
      * @returns The computed value, or `undefined` if the key was not present or removed.
      */
     public computeIfPresent(key: K, fn: (key: K, oldValue: V) => Optional<V>): Optional<V> {
@@ -141,7 +141,7 @@ export class EnMap<K, V> extends Map<K, V> {
     }
 
     /**
-     * Finds all values tha satisfies the provided testing function.
+     * Finds all values that satisfy the provided testing function.
      * @param fn A function for searching.
      * @returns The array of values that satisfies the testing function.
      */
@@ -160,7 +160,7 @@ export class EnMap<K, V> extends Map<K, V> {
     /**
      * Finds the first key that satisfies the provided testing function.
      *
-     * @param fn A tunction for searching.
+     * @param fn A function for searching.
      * @returns The first key that satisfies the testing function, or `undefined` if not found.
      */
     public findKey(fn: (value: V, key: K, map: this) => boolean): Optional<K> {
@@ -177,7 +177,7 @@ export class EnMap<K, V> extends Map<K, V> {
      * Finds all values the satifies the provided testing function.
      *
      * @param fn A function for searching.
-     * @returns The array of keys that satisfites the testing function.
+     * @returns The array of keys that satisfies the testing function.
      */
     public findKeyAll(fn: (value: V, key: K, map: this) => boolean): K[] {
         const result: K[] = [];
@@ -193,7 +193,7 @@ export class EnMap<K, V> extends Map<K, V> {
 
     /**
      * Alias for `.has()`
-     * @returns Boolean indicates whether the key is exist or not.
+     * @returns A boolean indicating whether the key is exist or not.
      */
     public hasKey(key: K): boolean {
         return this.has(key);
@@ -201,7 +201,7 @@ export class EnMap<K, V> extends Map<K, V> {
 
     /**
      * Obtains a value by the key,
-     * or returns `defaultValue` if the key is not exiting.
+     * or returns `defaultValue` if the key is not exist.
      * @returns The value associated with key, or `defaultValue`.
      */
     public getOrDefault(key: K, defaultValue: V): V {
@@ -210,7 +210,7 @@ export class EnMap<K, V> extends Map<K, V> {
     }
 
     /**
-     * @returns Boolean indicates whether this map is empty, or not.
+     * @returns A boolean indicating whether this map is empty, or not.
      */
     public isEmpty(): boolean {
         return this.size === 0;
@@ -239,13 +239,13 @@ export class EnMap<K, V> extends Map<K, V> {
     }
 
     /**
-     * Attempts to put the value according to provided remapping function.
+     * Attempts to insert or update the value using the provided remapping function.
      *
      * Removes the entry if the remapping function returns `null` or `undefined`.
      *
      * @param key The key to compute the value.
      * @param value The args `newValue` in `fn`.
-     * @param fn A function that try to remap a value into this map.
+     * @param fn A function that tries remap a value to this map.
      * @returns The new value after merge, or `undefined` if the entry was deleted.
      */
     public merge(key: K, value: V, fn: (oldValue: V, newValue: V) => Optional<V>): Optional<V> {
@@ -273,11 +273,11 @@ export class EnMap<K, V> extends Map<K, V> {
     }
 
     /**
-     * Adds all provided entries into this map.
+     * Adds all provided entries to this map.
      */
     public setAll(map: ReadonlyMap<K, V>): this;
     /**
-     * Adds all provided entries into this map.
+     * Adds all provided entries to this map.
      * @param map
      * @param override Whether override the key already exists.
      */
@@ -293,7 +293,7 @@ export class EnMap<K, V> extends Map<K, V> {
     }
 
     /**
-     * Attempts to put the value if the value is not already existing.
+     * Attempts to put the value if the value is not already exist.
      *
      * Recognize `null` value in this map as absent.
      *
@@ -318,7 +318,7 @@ export class EnMap<K, V> extends Map<K, V> {
     public replace(key: K, value: V): Optional<V>;
     /**
      * Replaces the value associated with the key.
-     * @returns Boolean indicates whether the entries was replaced, or not.
+     * @returns A boolean indicating whether the entries was replaced, or not.
      */
     public replace(key: K, oldValue: V, newValue: V): boolean;
     public replace(key: K, v1: V, v2?: V): Optional<V> | boolean {
