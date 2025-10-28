@@ -1,6 +1,6 @@
 export type Optional<Type> = Type | undefined | null;
 
-const __isNullish = (v: unknown) => v === undefined || v === null;
+const __isNullish = (v: unknown): v is undefined | null => v === undefined || v === null;
 
 /**
  * An enhanced Map for TypeScript with Java-style utility methods.
