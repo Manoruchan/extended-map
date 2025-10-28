@@ -1,20 +1,24 @@
 # extended-map
 
-A  `Map` extension for TypeScript, inspired by Java's `HashMap` utility methods.
-
-Use familiar `Map` APIs enhanced with powerful, type-safe methods like `computeIfAbsent`, `merge`, `getOrDefault`, and more.
+## Enhanced Map
+`EnMap` is an enhanced `Map` implementation that provides Java-inspired methods such as `compute` and `merge`.
 
 npm: [`@manoruchan/extended-map`](https://www.npmjs.com/package/@manoruchan/extended-map)
 
+### Migration Notice
+`EnMap` is the successor to `ExtMap`. `ExtMap` is now deprecated and will be removed in `v3.0.0`.
 
 ## Features
 
-- `compute`, `computeIfAbsent`, `computeIfPresent`, `merge`, `replace`
-- `clone`, `sweep`, `setIfAbsent`, `setAll`, `getOrDefault`
-- `find`, `filter`, `map`, `keysArray`, `valuesArray`, `toArray`
-- Fully compatible with the standard `Map<K, V>` API
-- Lightweight and dependency-free
+1. **Java-like operations**
+    - Powerful methods that adapt their behavior based on whether a value exists or is nullish.
+      (`compute`, `computeIfPresent`, `computeIfAbsent`, `merge`)
 
+2. **Nullish value handling**
+    - Treats both `undefined` (returned by `Map.get(key)`) and `null` as **lack of value** in almost operations.
+      The entry will be removed if `compute` or `merge` returns `null` or `undefined`.
+3. **Utility methods**
+    - Provides convenient array-like utilities such as `filter`, `sweep`, `keysArray`, and `valuesArray`.
 
 ## Installation
 
@@ -22,112 +26,111 @@ npm: [`@manoruchan/extended-map`](https://www.npmjs.com/package/@manoruchan/exte
 npm install @manoruchan/extended-map
 ```
 
-
 ## Usage
 
+1. `computeIfAbsent`
+
+Example
 ```ts
-import { ExtMap } from "@manoruchan/extended-map";
+import { EnMap } from "@manoruchan/extended-map";
 
-const map = new ExtMap<string, number>();
+const cache = new EnMap<string, string>();
 
-map.set("a", 1);
+// Executes the mapping function and stores the result
+// only if the key does not already exist.
+const data1 = cache.computeIfAbsent("user:02", () => {
+    // do something like fetching DB...
+    return "Alice";
+});
 
-// computeIfAbsent
-map.computeIfAbsent("b", () => 2); // adds "b" -> 2
-map.computeIfAbsent("a", () => 100); // keeps "a" -> 1
+// The key is already existing, so the mapping function won't be executed.
+const data2 = cache.computeIfAbsent("user:02", () => {
+    // do something like fetching DB...
+    return "Bob";
+});
 
-// getOrDefault
-console.log(map.getOrDefault("c", 0)); // 0
+// data1 === "Alice"
+// data2 === "Alice"
 
-// merge
-map.merge("a", 10, (oldVal, newVal) => oldVal + newVal); // "a" -> 11
-
-// sweep
-map.sweep((v) => v < 5); // removes entries with value < 5
 ```
 
+Example
+```ts
+// <username, <command, timestamp>>
+const cooldowns = new EnMap<string, EnMap<string, number>>();
+const now = Date.now();
+const COOLDOWN_MS = 3000;
 
-## API Reference
+cooldowns
+    .computeIfAbsent("Alice", _ => new EnMap<string, number>())
+    .set("ping", now + COOLDOWN_MS);
 
-`clone(): ExtMap<K, V>;`
+const pingCooldown = cooldowns.get("Alice")?.get("ping");
 
-Creates a shallow copy of the map.
+if (pingCooldown !== undefined) {
+    console.log(pingCooldown > now); // true
+}
+```
 
-`compute(key: K, remappingFunction: (key: K, value: V | undefined) => V): V | undefined;`
+2. `merge`
+Merges old value and new value, set a new value if the key is not exists.
 
-Attempts to compute a value using the given remapping function and put it into this map.
-Deletes the value associated with the given key if the remapping function returns `undefined` or `null`.
+Example
+```ts
+const wordCounts = new EnMap<string, number>();
 
-`computeIfAbsent(key: K, mappingFunction: (key: K) => V): V;`
+// Absent
+wordCounts.merge("apple", 1, (oldV, newV) => oldV + newV);
 
-If the specified key is not already associated with a value (or is mapped to `undefined` or `null`),
-attempts to compute its value using the given mapping function and enters it into this map.
+// Present
+wordCounts.merge("apple", 1, (oldV, newV) => oldV + newV);
 
-`computeIfPresent(key: K, remappingFunction: (key: K, value: V) => V): V | undefined;`
+// Present
+wordCounts.merge("apple", 1, (oldV, newV) => oldV + newV);
 
-If the specified key is already associated with a value (or is mapped to `null`),
-attempts to compute its value using the given remapping function and enter it into this map.
+// Result: 3
+console.log(wordCounts.get("apple"));
+```
 
-`filter(fn: (value: V, key: K, map: this) => boolean): this;`
+3. `computeIfPresent`
 
-Returns a ExtMap which contains filtered values.
+Example
+```ts
+const items = new EnMap<string, number>();
+items.set("mana_potion", 5);
 
-`find(fn: (value: V, key: K, map: this) => boolean): V | undefined;`
+// Reduce item amounts
+items.computeIfPresent("mana_potion", (_, oldV) => oldV - 1);
+console.log(items.get("mana_potion")); // 4
 
-Finds the first value that satisfies the provided testing function.
+// Deleted from map due to mapping function returns undefined
+items.computeIfPresent("mana_potion", (_, oldV) => {
+    if (oldV - 4 === 0) {
+        return undefined;
+    }
+});
+console.log(items.has("mana_potion")); // false
+```
 
-`getOrDefault(key: K, defaultValue: V): V;`
+## API Reference (Primary Methods)
+`compute(key, fn): Optional<V>` — Computes based on the mapping function, regardless of key existence.
 
-Obtains the value associated with specified key,
-or returns `defaultValue` if the value is not existing.
+`computeIfAbsent(key, fn): V` — Set the value if the key is not exist or assigned as `null`.
 
-`isEmpty(): boolean;`
+`computeIfPresent(key, fn): Optional<V>` — Computes if the key exists. Deletes if `fn` returns `nullish`.
 
-Checks whether this map is empty, or not.
+`merge(key, value, fn): Optional<V>` — Set the `value` if the key is not exist, otherwise merge by `fn`. Deletes if `fn` returns `nullish`.
 
-`keysArray(): K[];`
+`delete(key, value?): boolean` — Deletes the entry if key and value matched.
 
-Returns an array of keys.
+`getOrDefault(key, defaultValue): V` — Returns `defaultValue`if the key is not exist. If the value is `null`, returns `null`.
 
-`map<U>(fn: (value: V, key: K, map: this) => U): U[];`
+`sweep(fn): V[]` — Deletes all entries satisfies condition and returns an array of removed values.
 
-Applies a function to each keys and values and returns an array.
-
-`merge(key: K, value: V, remappingFunction: (oldValue: V, newValue: V, map: this) => V): V | undefined;`
-
-Attempts to put the value according to the remapping function. Returns the newly associated value after merge.
-
-`replace(key: K, newValue: V): V | undefined;`
-
-`replace(key: K, oldValue: V, newValue: V): boolean;`
-
-Replaces the value associated with specified key.
-
-`setAll(other: Map<K, V> | ExtMap<K, V>): this;`
-
-Adds whole entries in a specified map into this map.
-Returns another Map or ExtMap.
-
-
-`setIfAbsent(key: K, value: V): V | null;`
-
-Attempts to put the value if the value is not already existing.
-If `null` is mapped as a value, recognize it as absent.
-Returns the new value if set, the existing value if present, or `null` if `null` was previously associated.
-
-
-`sweep(fn: (value: V, key: K, map: this) => boolean): V[];`
-
-Removes all specified values. Returns removed values.
-
-`toArray(): [K, V][];`
-
-Returns an array of entries.
-
-`valuesArray(): V[];`
-
-Returns an array of values.
-
+## Optional Type
+```ts
+export type Optional<Type> = Type | undefined | null;
+```
 
 ## License
 [MIT](https://github.com/Manoruchan/extended-map/blob/main/LICENSE)
