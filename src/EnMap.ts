@@ -193,7 +193,7 @@ export class EnMap<K, V> extends Map<K, V> {
 
     /**
      * Alias for `.has()`
-     * @returns A boolean indicating whether the key is exist or not.
+     * @returns A boolean indicating whether the key exists or not.
      */
     public hasKey(key: K): boolean {
         return this.has(key);
@@ -210,7 +210,7 @@ export class EnMap<K, V> extends Map<K, V> {
     }
 
     /**
-     * @returns A boolean indicating whether this map is empty, or not.
+     * @returns A boolean indicating whether this map is empty or not.
      */
     public isEmpty(): boolean {
         return this.size === 0;
