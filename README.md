@@ -5,21 +5,20 @@
 
 npm: [`@manoruchan/extended-map`](https://www.npmjs.com/package/@manoruchan/extended-map)
 
-### Migration Notice
-`EnMap` is the successor to `ExtMap`. `ExtMap` is now deprecated and will be removed in `v3.0.0`.
+Migration Notice: `EnMap` is the successor to `ExtMap`. `ExtMap` is now deprecated and will be removed in `v3.0.0`.
 
 ## Features
 
-1. **Java-like operations**
-    - Powerful methods that adapt their behavior based on whether a value exists or is nullish.
+- **Java-like operations**
+  Powerful methods that adapt their behavior based on whether a value exists or is nullish.
       (`compute`, `computeIfPresent`, `computeIfAbsent`, `merge`)
 
-2. **Nullish value handling**
-    - Treats both `undefined` (returned by `Map.get(key)`) and `null` as **lack of value** in most operations
+- **Nullish value handling**
+  Treats both `undefined` (returned by `Map.get(key)`) and `null` as **lack of value** in most operations
       `null` can exist, but is considered *absent when acted upon*.
       The entry will be removed if `compute` or `merge` returns `null` or `undefined`.
-3. **Utility methods**
-    - Provides convenient array-like utilities such as `filter`, `sweep`, `keysArray`, and `valuesArray`.
+- **Utility methods**
+  Provides convenient array-like utilities such as `filter`, `sweep`, `some`, `every`.
 
 ## Installation
 
@@ -29,9 +28,7 @@ npm install @manoruchan/extended-map
 
 ## Usage
 
-1. `computeIfAbsent`
-
-Example
+Example `computeIfAbsent`
 ```ts
 import { EnMap } from "@manoruchan/extended-map";
 
@@ -55,7 +52,7 @@ const data2 = cache.computeIfAbsent("user:02", () => {
 
 ```
 
-Example
+Example `nested enmap`
 ```ts
 // <username, <command, timestamp>>
 const cooldowns = new EnMap<string, EnMap<string, number>>();
@@ -73,10 +70,7 @@ if (pingCooldown !== undefined) {
 }
 ```
 
-2. `merge`
-Merges the old and new values, or sets a new one if the key does not exist.
-
-Example
+Example `merge`
 ```ts
 const wordCounts = new EnMap<string, number>();
 
@@ -93,9 +87,7 @@ wordCounts.merge("apple", 1, (oldV, newV) => oldV + newV);
 console.log(wordCounts.get("apple"));
 ```
 
-3. `computeIfPresent`
-
-Example
+Example `computeIfPresent`
 ```ts
 const items = new EnMap<string, number>();
 items.set("mana_potion", 5);
