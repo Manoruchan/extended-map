@@ -100,12 +100,25 @@ export class EnMap<K, V> extends Map<K, V> {
             return super.delete(key);
         } else {
             const currentValue = this.get(key);
-            if (!__isNullish(currentValue) && currentValue === value) {
+            if (currentValue === value) {
                 return super.delete(key);
             }
         }
 
         return false;
+    }
+
+    /**
+     * Identical to `Array.every()`.
+     */
+    public every(fn: (value: V, key: K, map: this) => boolean): boolean {
+        for (const [k, v] of this) {
+            if (!fn(v, k, this)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -338,6 +351,19 @@ export class EnMap<K, V> extends Map<K, V> {
             }
             return false;
         }
+    }
+
+    /**
+     * Identical to `Array.some()`.
+     */
+    public some(fn: (value: V, key: K, map: this) => boolean): boolean {
+        for (const [k, v] of this) {
+            if (fn(v, k, this)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
