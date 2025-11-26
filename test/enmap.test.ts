@@ -1,7 +1,7 @@
 import test, { beforeEach, describe } from "node:test";
 import { strictEqual, deepStrictEqual } from "node:assert";
 
-import { EnMap, Optional } from "../src/EnMap";
+import { EnMap } from "../src/maps/EnMap";
 
 function createTestMap(): EnMap<number, string | null> {
     return new EnMap<number, string | null>([
@@ -43,7 +43,7 @@ describe("EnMap Basic and Iteration Operations", () => {
         deepStrictEqual(map.toArray(), [
             [1, "one"],
             [2, "two"],
-            [3, null],
+            [3, null]
         ]);
     });
 });
@@ -55,7 +55,7 @@ describe("EnMap Java Semantics (Monadic Operations) - Existence and Absence", ()
         map = new EnMap<string, number | null>([
             ["present", 10],
             ["nullishValue", null],
-            ["absent", undefined as any],
+            ["absent", undefined as any]
         ]);
         map.delete("absent");
     });
@@ -102,9 +102,7 @@ describe("EnMap Monadic Compute Operations", () => {
     const key = "data";
 
     beforeEach(() => {
-        map = new EnMap<string, number>([
-            [key, 10]
-        ]);
+        map = new EnMap<string, number>([[key, 10]]);
     });
 
     // --- compute ---
@@ -201,14 +199,14 @@ describe("EnMap Monadic Merge Operation", () => {
 });
 
 describe("EnMap Utility/Array Methods", () => {
-    let map: EnMap<number, { name: string, score: number }>;
+    let map: EnMap<number, { name: string; score: number }>;
 
     beforeEach(() => {
         map = new EnMap([
             [1, { name: "Alice", score: 90 }],
             [2, { name: "Bob", score: 75 }],
             [3, { name: "Charlie", score: 95 }],
-            [4, { name: "David", score: 60 }],
+            [4, { name: "David", score: 60 }]
         ]);
     });
 
@@ -245,7 +243,10 @@ describe("EnMap Utility/Array Methods", () => {
     test("sweep should remove and return swept values", () => {
         const sweptValues = map.sweep(v => v.score < 80);
         strictEqual(sweptValues.length, 2);
-        deepStrictEqual(sweptValues.map(v => v.name), ["Bob", "David"]);
+        deepStrictEqual(
+            sweptValues.map(v => v.name),
+            ["Bob", "David"]
+        );
         strictEqual(map.size, 2);
         strictEqual(map.has(2), false);
     });
@@ -257,7 +258,7 @@ describe("EnMap Replace Operations", () => {
     beforeEach(() => {
         map = new EnMap<string, number>([
             ["a", 10],
-            ["b", 20],
+            ["b", 20]
         ]);
     });
 
