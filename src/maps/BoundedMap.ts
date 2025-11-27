@@ -8,10 +8,10 @@ export class BoundedHashMap<K, V> extends HashMap<K, V> {
     constructor(entries: Iterable<[K, V]>, capacity: number, strict?: boolean);
     constructor(arg1: any, arg2?: any, arg3?: any) {
         super();
-        if (typeof arg1 === "number") {
+        if (typeof arg1 === "number" && arg1 > 0) {
             this._capacity = arg1;
             this._strict = arg2 ?? false;
-        } else if (typeof arg1[Symbol.iterator] === "function") {
+        } else if (typeof arg1?.[Symbol.iterator] === "function") {
             this.setAll(arg1);
             this._capacity = arg2;
             this._strict = arg3 ?? false;
@@ -27,6 +27,7 @@ export class BoundedHashMap<K, V> extends HashMap<K, V> {
             const msg = `capacity exceeded: capacity ${this._capacity}`;
             if (this._strict) throw new Error(msg);
             console.warn(msg);
+            return super.get(key);
         }
 
         return super.set(key, value);
