@@ -23,19 +23,19 @@ export class HashMap<K, V> implements HashMapLike<K, V> {
         return this._map.size;
     }
 
-    entries(): IterableIterator<[K, V]> {
+    entries(): Iterable<[K, V]> {
         return this._map.entries();
     }
 
-    keys(): IterableIterator<K> {
+    keys(): Iterable<K> {
         return this._map.keys();
     }
 
-    values(): IterableIterator<V> {
+    values(): Iterable<V> {
         return this._map.values();
     }
 
-    [Symbol.iterator](): IterableIterator<[K, V]> {
+    [Symbol.iterator](): Iterator<[K, V]> {
         return this._map.entries();
     }
 
