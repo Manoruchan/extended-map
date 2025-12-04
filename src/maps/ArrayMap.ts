@@ -1,6 +1,7 @@
+import { ICollection } from "../interface/ICollection";
 import { IHashMap } from "../interface/IHashMap";
 
-export class ArrayMap<K, V> implements IHashMap<K, V> {
+export class ArrayMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
     private readonly _index: Map<K, number>;
     private readonly _keys: K[];
     private readonly _values: V[];
@@ -149,6 +150,121 @@ export class ArrayMap<K, V> implements IHashMap<K, V> {
         return this;
     }
 
+    /* HashMap<K, V> */
+
+    clone(): ArrayMap<K, V> {
+        return new ArrayMap<K, V>(this.toArray());
+    }
+
+    compute(key: K, fn: (key: K, oldValue: V | undefined) => V | undefined): V | undefined {
+        const index = this._index.get(key);
+        const oldValue = index !== undefined ? this._values[index] : undefined;
+        const newValue = fn(key, oldValue);
+        if (newValue === undefined) {
+            this.delete(key);
+        } else {
+            this.set(key, newValue);
+        }
+        return newValue;
+    }
+
+    computeIfAbsent(key: K, fn: (key: K) => V): V {
+        const index = this._index.get(key);
+        if (index !== undefined) {
+            return this._values[index];
+        }
+        const newValue = fn(key);
+        this.set(key, newValue);
+        return newValue;
+    }
+
+    computeIfPresent(key: K, fn: (key: K, oldValue: V) => V | undefined): V | undefined {
+        const index = this._index.get(key);
+        if (index !== undefined) {
+            const newValue = fn(key, this._values[index]);
+            if (newValue === undefined) {
+                this.delete(key);
+            } else {
+                this._values[index] = newValue;
+            }
+            return newValue;
+        }
+    }
+
+    getOrDefault(key: K, defaultValue: V): V {
+        return this.get(key) ?? defaultValue;
+    }
+
+    isEmpty(): boolean {
+        return this._index.size === 0;
+    }
+
+    merge(key: K, value: V, fn: (oldValue: V, newValue: V) => V | undefined): V | undefined {
+        const index = this._index.get(key);
+        const newValue = index !== undefined ? fn(this._values[index], value) : value;
+        if (newValue == undefined) {
+            this.delete(key);
+        } else {
+            this.set(key, newValue);
+        }
+        return newValue;
+    }
+
+    put(key: K, value: V): V | undefined {
+        const index = this._index.get(key);
+        let oldValue: V | undefined = undefined;
+
+        if (index !== undefined) {
+            oldValue = this._values[index];
+            this._values[index] = value;
+        } else {
+            this._index.set(key, this._values.length);
+            this._keys.push(key);
+            this._values.push(value);
+        }
+        return oldValue;
+    }
+
+    replace(key: K, newValue: V): V | undefined;
+    replace(key: K, oldValue: V, newValue: V): boolean;
+    replace(key: K, value1: V, value2?: V): V | undefined | boolean {
+        const index = this._index.get(key);
+        // replace(key, newValue) -> V | undefined
+        if (value2 === undefined) {
+            if (index === undefined) {
+                return undefined;
+            }
+            const oldValue = this._values[index];
+            this._values[index] = value1;
+            return oldValue;
+        }
+        // replace(key, oldValue, newValue) -> boolean
+        else {
+            if (index !== undefined && this._values[index] === value1) {
+                this._values[index] = value2;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    setAll(map: Iterable<[K, V]>, override?: boolean): void {
+        for (const [key, value] of map) {
+            if (override || !this.has(key)) {
+                this.set(key, value);
+            }
+        }
+    }
+
+    setIfAbsent(key: K, value: V): V {
+        const index = this._index.get(key);
+        if (index === undefined) {
+            this.set(key, value);
+            return value;
+        }
+        return this._values[index];
+    }
+
     /* ReadonlyCollection<K, V> */
 
     every(fn: (value: V, key: K, map: this) => boolean): boolean {
@@ -290,120 +406,5 @@ export class ArrayMap<K, V> implements IHashMap<K, V> {
             this.delete(key);
         }
         return result;
-    }
-
-    /* HashMap<K, V> */
-
-    clone(): ArrayMap<K, V> {
-        return new ArrayMap<K, V>(this.toArray());
-    }
-
-    compute(key: K, fn: (key: K, oldValue: V | undefined) => V | undefined): V | undefined {
-        const index = this._index.get(key);
-        const oldValue = index !== undefined ? this._values[index] : undefined;
-        const newValue = fn(key, oldValue);
-        if (newValue === undefined) {
-            this.delete(key);
-        } else {
-            this.set(key, newValue);
-        }
-        return newValue;
-    }
-
-    computeIfAbsent(key: K, fn: (key: K) => V): V {
-        const index = this._index.get(key);
-        if (index !== undefined) {
-            return this._values[index];
-        }
-        const newValue = fn(key);
-        this.set(key, newValue);
-        return newValue;
-    }
-
-    computeIfPresent(key: K, fn: (key: K, oldValue: V) => V | undefined): V | undefined {
-        const index = this._index.get(key);
-        if (index !== undefined) {
-            const newValue = fn(key, this._values[index]);
-            if (newValue === undefined) {
-                this.delete(key);
-            } else {
-                this._values[index] = newValue;
-            }
-            return newValue;
-        }
-    }
-
-    getOrDefault(key: K, defaultValue: V): V {
-        return this.get(key) ?? defaultValue;
-    }
-
-    isEmpty(): boolean {
-        return this._index.size === 0;
-    }
-
-    merge(key: K, value: V, fn: (oldValue: V, newValue: V) => V | undefined): V | undefined {
-        const index = this._index.get(key);
-        const newValue = index !== undefined ? fn(this._values[index], value) : value;
-        if (newValue == undefined) {
-            this.delete(key);
-        } else {
-            this.set(key, newValue);
-        }
-        return newValue;
-    }
-
-    put(key: K, value: V): V | undefined {
-        const index = this._index.get(key);
-        let oldValue: V | undefined = undefined;
-
-        if (index !== undefined) {
-            oldValue = this._values[index];
-            this._values[index] = value;
-        } else {
-            this._index.set(key, this._values.length);
-            this._keys.push(key);
-            this._values.push(value);
-        }
-        return oldValue;
-    }
-
-    replace(key: K, newValue: V): V | undefined;
-    replace(key: K, oldValue: V, newValue: V): boolean;
-    replace(key: K, value1: V, value2?: V): V | undefined | boolean {
-        const index = this._index.get(key);
-        // replace(key, newValue) -> V | undefined
-        if (value2 === undefined) {
-            if (index === undefined) {
-                return undefined;
-            }
-            const oldValue = this._values[index];
-            this._values[index] = value1;
-            return oldValue;
-        }
-        // replace(key, oldValue, newValue) -> boolean
-        else {
-            if (index !== undefined && this._values[index] === value1) {
-                this._values[index] = value2;
-                return true;
-            }
-            return false;
-        }
-    }
-
-    setAll(map: Iterable<[K, V]>, override?: boolean): void {
-        for (const [key, value] of map) {
-            if (override || !this.has(key)) {
-                this.set(key, value);
-            }
-        }
-    }
-
-    setIfAbsent(key: K, value: V): V {
-        const index = this._index.get(key);
-        if (index === undefined) {
-            this.set(key, value);
-            return value;
-        }
-        return this._values[index];
     }
 }
