@@ -20,7 +20,7 @@ export class BoundedHashMap<K, V> extends HashMap<K, V> {
         }
     }
 
-    override set(key: K, value: V): V | undefined {
+    override put(key: K, value: V): V | undefined {
         const exists: boolean = this.has(key);
 
         if (!exists && this.size >= this._capacity) {
@@ -30,6 +30,20 @@ export class BoundedHashMap<K, V> extends HashMap<K, V> {
             return super.get(key);
         }
 
-        return super.set(key, value);
+        return super.put(key, value);
+    }
+
+    override set(key: K, value: V): this {
+        const exists: boolean = this.has(key);
+
+        if (!exists && this.size >= this._capacity) {
+            const msg = `capacity exceeded: capacity ${this._capacity}`;
+            if (this._strict) throw new Error(msg);
+            console.warn(msg);
+            return this;
+        }
+
+        super.set(key, value);
+        return this;
     }
 }

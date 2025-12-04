@@ -1,14 +1,20 @@
-import { HashMapLike } from "../interface/HashMapLike";
+import { IHashMap } from "../interface/IHashMap";
 
-export class HashMap<K, V> implements HashMapLike<K, V> {
+export class HashMap<K, V> implements IHashMap<K, V> {
     private _map: Map<K, V>;
 
     constructor(entries?: Iterable<[K, V]>) {
-        if (entries !== undefined && typeof entries[Symbol.iterator] === "function") {
-            this._map = new Map(entries);
-        } else {
-            this._map = new Map();
+        this._map = new Map();
+
+        if (typeof entries?.[Symbol.iterator] === "function") {
+            this.setAll(entries);
         }
+    }
+
+    /* ReadonlyMap<K, V> */
+
+    entries(): IterableIterator<[K, V]> {
+        return this._map.entries();
     }
 
     get(key: K): V | undefined {
@@ -19,30 +25,30 @@ export class HashMap<K, V> implements HashMapLike<K, V> {
         return this._map.has(key);
     }
 
+    keys(): IterableIterator<K> {
+        return this._map.keys();
+    }
+
     get size(): number {
         return this._map.size;
     }
 
-    entries(): Iterable<[K, V]> {
-        return this._map.entries();
+    [Symbol.iterator](): IterableIterator<[K, V]> {
+        return this._map[Symbol.iterator]();
     }
 
-    keys(): Iterable<K> {
-        return this._map.keys();
+    get [Symbol.toStringTag](): string {
+        return "HashMap";
     }
 
-    values(): Iterable<V> {
+    values(): IterableIterator<V> {
         return this._map.values();
     }
 
-    [Symbol.iterator](): Iterator<[K, V]> {
-        return this._map.entries();
-    }
+    /* MutableMap<K, V> */
 
-    set(key: K, value: V): V | undefined {
-        const oldValue = this._map.get(key);
-        this._map.set(key, value);
-        return oldValue;
+    clear(): void {
+        this._map.clear();
     }
 
     delete(key: K): boolean;
@@ -59,9 +65,12 @@ export class HashMap<K, V> implements HashMapLike<K, V> {
         return false;
     }
 
-    clear(): void {
-        this._map.clear();
+    set(key: K, value: V): this {
+        this._map.set(key, value);
+        return this;
     }
+
+    /* ReadonlyCollection<K, V> */
 
     every(fn: (value: V, key: K, map: this) => boolean): boolean {
         for (const [key, value] of this._map) {
@@ -147,19 +156,6 @@ export class HashMap<K, V> implements HashMapLike<K, V> {
         return false;
     }
 
-    sweep(fn: (value: V, key: K, map: this) => boolean): HashMap<K, V> {
-        const result: Map<K, V> = new Map();
-        for (const [key, value] of this._map) {
-            if (fn(value, key, this)) {
-                result.set(key, value);
-            }
-        }
-        for (const key of result.keys()) {
-            this._map.delete(key);
-        }
-        return new HashMap(result);
-    }
-
     toArray(): [K, V][] {
         return [...this._map.entries()];
     }
@@ -168,8 +164,25 @@ export class HashMap<K, V> implements HashMapLike<K, V> {
         return [...this._map.values()];
     }
 
+    /* Collection<K, V> */
+
+    sweep(fn: (value: V, key: K, map: this) => boolean): HashMap<K, V> {
+        const result: HashMap<K, V> = new HashMap();
+        for (const [key, value] of this._map) {
+            if (fn(value, key, this)) {
+                result.set(key, value);
+            }
+        }
+        for (const key of result.keys()) {
+            this._map.delete(key);
+        }
+        return result;
+    }
+
+    /* HashMap<K, V> */
+
     clone(): HashMap<K, V> {
-        return new HashMap(this._map.entries());
+        return new HashMap<K, V>(this._map.entries());
     }
 
     compute(key: K, fn: (key: K, oldValue: V | undefined) => V | undefined): V | undefined {
@@ -225,6 +238,34 @@ export class HashMap<K, V> implements HashMapLike<K, V> {
         return newValue;
     }
 
+    put(key: K, value: V): V | undefined {
+        const oldValue = this._map.get(key);
+        this._map.set(key, value);
+        return oldValue;
+    }
+
+    replace(key: K, newValue: V): V | undefined;
+    replace(key: K, oldValue: V, newValue: V): boolean;
+    replace(key: K, value1: V, value2?: V): V | undefined | boolean {
+        const existingValue = this.get(key);
+        // replace(key, newValue) -> V | undefined
+        if (value2 === undefined) {
+            if (existingValue === undefined) {
+                return undefined;
+            }
+            this.set(key, value1);
+            return existingValue;
+        }
+        // replace(key, oldValue, newValue) -> boolean
+        else {
+            if (existingValue !== undefined && existingValue === value1) {
+                this.set(key, value2);
+                return true;
+            }
+            return false;
+        }
+    }
+
     setAll(map: Iterable<[K, V]>): void;
     setAll(map: Iterable<[K, V]>, override: boolean): void;
     setAll(map: Iterable<[K, V]>, override: boolean = true): void {
@@ -242,27 +283,5 @@ export class HashMap<K, V> implements HashMapLike<K, V> {
             return value;
         }
         return existingValue;
-    }
-
-    replace(key: K, newValue: V): V | undefined;
-    replace(key: K, oldValue: V, newValue: V): boolean;
-    replace(key: K, value1: V, value2?: V): V | undefined | boolean {
-        const existingValue = this.get(key);
-        // replace(key: K, newValue: V): V | undefined;
-        if (value2 === undefined) {
-            if (existingValue === undefined) {
-                return undefined;
-            }
-            this.set(key, value1);
-            return existingValue;
-        }
-        // replace(key: K, oldValue: V, newValue: V): boolean;
-        else {
-            if (existingValue !== undefined && existingValue === value1) {
-                this.set(key, value2);
-                return true;
-            }
-            return false;
-        }
     }
 }
