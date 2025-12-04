@@ -1,6 +1,6 @@
 import { HashMap } from "./HashMap";
 
-export class BoundedHashMap<K, V> extends HashMap<K, V> {
+export class BoundedMap<K, V> extends HashMap<K, V> {
     private _capacity: number;
     private _strict: boolean;
 
@@ -24,7 +24,7 @@ export class BoundedHashMap<K, V> extends HashMap<K, V> {
         const exists: boolean = this.has(key);
 
         if (!exists && this.size >= this._capacity) {
-            const msg = `capacity exceeded: capacity ${this._capacity}`;
+            const msg = `capacity exceeded: capacity=${this._capacity}`;
             if (this._strict) throw new Error(msg);
             console.warn(msg);
             return super.get(key);
@@ -37,7 +37,7 @@ export class BoundedHashMap<K, V> extends HashMap<K, V> {
         const exists: boolean = this.has(key);
 
         if (!exists && this.size >= this._capacity) {
-            const msg = `capacity exceeded: capacity ${this._capacity}`;
+            const msg = `capacity exceeded: capacity=${this._capacity}`;
             if (this._strict) throw new Error(msg);
             console.warn(msg);
             return this;
@@ -45,5 +45,9 @@ export class BoundedHashMap<K, V> extends HashMap<K, V> {
 
         super.set(key, value);
         return this;
+    }
+
+    get [Symbol.toStringTag](): string {
+        return "BoundedMap";
     }
 }
