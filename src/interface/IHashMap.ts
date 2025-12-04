@@ -1,7 +1,7 @@
-import { Collection } from "./Collection";
+import { ICollection } from "./ICollection";
 
-export interface HashMapLike<K, V> extends Collection<K, V> {
-    clone(): HashMapLike<K, V>;
+export interface IHashMap<K, V> extends ICollection<K, V> {
+    clone(): IHashMap<K, V>;
     compute(key: K, fn: (key: K, oldValue: V | undefined) => V | undefined): V | undefined;
     computeIfAbsent(key: K, fn: (key: K) => V): V;
     computeIfPresent(key: K, fn: (key: K, oldValue: V) => V | undefined): V | undefined;
@@ -9,9 +9,9 @@ export interface HashMapLike<K, V> extends Collection<K, V> {
     getOrDefault(key: K, defaultValue: V): V;
     isEmpty(): boolean;
     merge(key: K, value: V, fn: (oldValue: V, newValue: V) => V | undefined): V | undefined;
-    set(key: K, value: V): V | undefined;
-    setAll(map: Iterable<[K, V]>, override?: boolean): void;
-    setIfAbsent(key: K, value: V): V;
+    put(key: K, value: V): V | undefined;
     replace(key: K, newValue: V): V | undefined;
     replace(key: K, oldValue: V, newValue: V): boolean;
+    setAll(map: Iterable<[K, V]>, override?: boolean): void;
+    setIfAbsent(key: K, value: V): V;
 }
