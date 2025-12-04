@@ -1,6 +1,6 @@
-import { ICollection } from "./ICollection";
+import { IMutableMap } from "./IMutableMap";
 
-export interface IHashMap<K, V> extends ICollection<K, V> {
+export interface IHashMap<K, V> extends IMutableMap<K, V> {
     clone(): IHashMap<K, V>;
     compute(key: K, fn: (key: K, oldValue: V | undefined) => V | undefined): V | undefined;
     computeIfAbsent(key: K, fn: (key: K) => V): V;
