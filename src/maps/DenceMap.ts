@@ -1,7 +1,7 @@
 import { ICollection } from "../interface/ICollection";
 import { IHashMap } from "../interface/IHashMap";
 
-export class ArrayMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
+export class DenceMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
     private readonly _index: Map<K, number>;
     private readonly _keys: K[];
     private readonly _values: V[];
@@ -79,7 +79,7 @@ export class ArrayMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
     }
 
     get [Symbol.toStringTag](): string {
-        return "ArrayMap";
+        return "DenceMap";
     }
 
     values(): IterableIterator<V> {
@@ -152,8 +152,8 @@ export class ArrayMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
 
     /* HashMap<K, V> */
 
-    clone(): ArrayMap<K, V> {
-        return new ArrayMap<K, V>(this.toArray());
+    clone(): DenceMap<K, V> {
+        return new DenceMap<K, V>(this.toArray());
     }
 
     compute(key: K, fn: (key: K, oldValue: V | undefined) => V | undefined): V | undefined {
@@ -276,8 +276,8 @@ export class ArrayMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
         return true;
     }
 
-    filter(fn: (value: V, key: K, map: this) => boolean): ArrayMap<K, V> {
-        const filteredMap = new ArrayMap<K, V>();
+    filter(fn: (value: V, key: K, map: this) => boolean): DenceMap<K, V> {
+        const filteredMap = new DenceMap<K, V>();
         for (let i = 0; i < this._values.length; i++) {
             const key = this._keys[i];
             const value = this._values[i];
@@ -393,8 +393,8 @@ export class ArrayMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
 
     /* Collection<K, V> */
 
-    sweep(fn: (value: V, key: K, map: this) => boolean): ArrayMap<K, V> {
-        const result = new ArrayMap<K, V>();
+    sweep(fn: (value: V, key: K, map: this) => boolean): DenceMap<K, V> {
+        const result = new DenceMap<K, V>();
         for (let i = 0; i < this._values.length; i++) {
             const key = this._keys[i];
             const value = this._values[i];
