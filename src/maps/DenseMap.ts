@@ -1,7 +1,4 @@
-import { ICollection } from "../interface/ICollection";
-import { IHashMap } from "../interface/IHashMap";
-
-export class DenceMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
+export class DenseMap<K, V> {
     private readonly _index: Map<K, number>;
     private readonly _keys: K[];
     private readonly _values: V[];
@@ -79,7 +76,7 @@ export class DenceMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
     }
 
     get [Symbol.toStringTag](): string {
-        return "DenceMap";
+        return "DenseMap";
     }
 
     values(): IterableIterator<V> {
@@ -152,8 +149,8 @@ export class DenceMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
 
     /* HashMap<K, V> */
 
-    clone(): DenceMap<K, V> {
-        return new DenceMap<K, V>(this.toArray());
+    clone(): DenseMap<K, V> {
+        return new DenseMap<K, V>(this.toArray());
     }
 
     compute(key: K, fn: (key: K, oldValue: V | undefined) => V | undefined): V | undefined {
@@ -276,8 +273,8 @@ export class DenceMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
         return true;
     }
 
-    filter(fn: (value: V, key: K, map: this) => boolean): DenceMap<K, V> {
-        const filteredMap = new DenceMap<K, V>();
+    filter(fn: (value: V, key: K, map: this) => boolean): DenseMap<K, V> {
+        const filteredMap = new DenseMap<K, V>();
         for (let i = 0; i < this._values.length; i++) {
             const key = this._keys[i];
             const value = this._values[i];
@@ -393,8 +390,8 @@ export class DenceMap<K, V> implements IHashMap<K, V>, ICollection<K, V> {
 
     /* Collection<K, V> */
 
-    sweep(fn: (value: V, key: K, map: this) => boolean): DenceMap<K, V> {
-        const result = new DenceMap<K, V>();
+    sweep(fn: (value: V, key: K, map: this) => boolean): DenseMap<K, V> {
+        const result = new DenseMap<K, V>();
         for (let i = 0; i < this._values.length; i++) {
             const key = this._keys[i];
             const value = this._values[i];

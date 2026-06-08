@@ -1,6 +1,6 @@
-import { ArrayMap } from "../src/maps/ArrayMap";
+import { DenseMap } from "../src/index";
 
-const map = new ArrayMap<string, number>();
+const map = new DenseMap<string, number>();
 
 console.log(map);
 map.set("a", 1);

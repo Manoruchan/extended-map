@@ -1,6 +1,4 @@
-import { IHashMap } from "../interface/IHashMap";
-
-export class HashMap<K, V> implements IHashMap<K, V> {
+export class HashMap<K, V> {
     private _map: Map<K, V>;
 
     constructor(entries?: Iterable<[K, V]>) {

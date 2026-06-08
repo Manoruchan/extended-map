@@ -1,24 +1,21 @@
 # extended-map
 
-## Enhanced Map
-`EnMap` is an enhanced `Map` implementation that provides Java-inspired methods such as `compute` and `merge`.
+> Java-inspired Map utilities for TypeScript/JavaScript.
 
-npm: [`@manoruchan/extended-map`](https://www.npmjs.com/package/@manoruchan/extended-map)
+[![npm](https://img.shields.io/npm/v/@manoruchan/extended-map)](https://www.npmjs.com/package/@manoruchan/extended-map)
+[![license](https://img.shields.io/npm/l/@manoruchan/extended-map)](https://github.com/Manoruchan/extended-map/blob/main/LICENSE)
 
-Migration Notice: `EnMap` is the successor to `ExtMap`. `ExtMap` is now deprecated and will be removed in `v3.0.0`.
+## Overview
 
-## Features
+`extended-map` provides three enhanced `Map` implementations with Java-inspired methods like `compute` and `merge`, plus array-like utilities.
 
-- **Java-like operations**
-  Powerful methods that adapt their behavior based on whether a value exists or is nullish.
-      (`compute`, `computeIfPresent`, `computeIfAbsent`, `merge`)
+| Class | Description |
+|---|---|
+| `HashMap` | Core map with Java-style compute / merge methods |
+| `DenseMap` | Extends `HashMap` with array-like utilities (`filter`, `sweep`, `some`, `every`) using swap-delete for O(1) removal |
+| `BoundedMap` | Extends `HashMap` with a configurable capacity limit |
 
-- **Nullish value handling**
-  Treats both `undefined` (returned by `Map.get(key)`) and `null` as **lack of value** in most operations
-      `null` can exist, but is considered *absent when acted upon*.
-      The entry will be removed if `compute` or `merge` returns `null` or `undefined`.
-- **Utility methods**
-  Provides convenient array-like utilities such as `filter`, `sweep`, `some`, `every`.
+> **Note:** Unlike Java's `HashMap`, `null` is treated as a valid value in all three classes.
 
 ## Installation
 
@@ -28,103 +25,107 @@ npm install @manoruchan/extended-map
 
 ## Usage
 
-Example `computeIfAbsent`
+### `computeIfAbsent`
+
+Executes the mapping function and stores the result only if the key does not already exist.
+
 ```ts
-import { EnMap } from "@manoruchan/extended-map";
+import { HashMap } from "@manoruchan/extended-map";
 
-const cache = new EnMap<string, string>();
+const cache = new HashMap<string, string>();
 
-// Executes the mapping function and stores the result
-// only if the key does not already exist.
-const data1 = cache.computeIfAbsent("user:02", () => {
-    // do something like fetching DB...
-    return "Alice";
-});
-
-// The key is already existing, so the mapping function won't be executed.
-const data2 = cache.computeIfAbsent("user:02", () => {
-    // do something like fetching DB...
-    return "Bob";
-});
-
-// data1 === "Alice"
-// data2 === "Alice"
-
+const data1 = cache.computeIfAbsent("user:02", () => fetchFromDB()); // → "Alice"
+const data2 = cache.computeIfAbsent("user:02", () => fetchFromDB()); // skipped
+// data1 === data2 === "Alice"
 ```
 
-Example `nested enmap`
+### `computeIfPresent`
+
+Executes the mapping function only if the key already exists. Returning `undefined` removes the entry.
+
 ```ts
-// <username, <command, timestamp>>
-const cooldowns = new EnMap<string, EnMap<string, number>>();
-const now = Date.now();
-const COOLDOWN_MS = 3000;
-
-cooldowns
-    .computeIfAbsent("Alice", _ => new EnMap<string, number>())
-    .set("ping", now + COOLDOWN_MS);
-
-const pingCooldown = cooldowns.get("Alice")?.get("ping");
-
-if (pingCooldown !== undefined) {
-    console.log(pingCooldown > now); // true
-}
-```
-
-Example `merge`
-```ts
-const wordCounts = new EnMap<string, number>();
-
-// Absent
-wordCounts.merge("apple", 1, (oldV, newV) => oldV + newV);
-
-// Present
-wordCounts.merge("apple", 1, (oldV, newV) => oldV + newV);
-
-// Present
-wordCounts.merge("apple", 1, (oldV, newV) => oldV + newV);
-
-// Result: 3
-console.log(wordCounts.get("apple"));
-```
-
-Example `computeIfPresent`
-```ts
-const items = new EnMap<string, number>();
+const items = new HashMap<string, number>();
 items.set("mana_potion", 5);
 
-// Reduce item amounts
-items.computeIfPresent("mana_potion", (_, oldV) => oldV - 1);
+items.computeIfPresent("mana_potion", (_, v) => v - 1);
 console.log(items.get("mana_potion")); // 4
 
-// Deleted from map due to mapping function returns undefined
-items.computeIfPresent("mana_potion", (_, oldV) => {
-    if (oldV - 4 === 0) {
-        return undefined;
-    }
-});
+// Return undefined to delete the entry
+items.computeIfPresent("mana_potion", (_, v) => (v - 4 === 0 ? undefined : v));
 console.log(items.has("mana_potion")); // false
 ```
 
-## API Reference (Primary Methods)
-`compute(key, fn): Optional<V>` — Computes based on the mapping function, regardless of key existence.
+### `merge`
 
-`computeIfAbsent(key, fn): V` — Set the value if the key is not exist or assigned as `null`.
+Merges a value into an existing entry using a remapping function, or inserts it if absent.
 
-`computeIfPresent(key, fn): Optional<V>` — Computes if the key exists. Deletes if `fn` returns `nullish`.
-
-`merge(key, value, fn): Optional<V>` — Set the `value` if the key is not exist, otherwise merge by `fn`. Deletes if `fn` returns `nullish`.
-
-`delete(key, value?): boolean` — Deletes the entry if key and value matched.
-
-`getOrDefault(key, defaultValue): V` — Returns `defaultValue` if the key does not exist. If the value is `null`, returns `null`.
-
-`sweep(fn): V[]` — Deletes all entries satisfies condition and returns an array of removed values.
-
-## Optional Type
 ```ts
-// Used internally to represent values that may be missing or nullish.
-export type Optional<Type> = Type | undefined | null;
+const wordCounts = new HashMap<string, number>();
+
+wordCounts.merge("apple", 1, (old, newV) => old + newV); // absent  → 1
+wordCounts.merge("apple", 1, (old, newV) => old + newV); // present → 2
+wordCounts.merge("apple", 1, (old, newV) => old + newV); // present → 3
+
+console.log(wordCounts.get("apple")); // 3
+```
+
+### Nested maps
+
+```ts
+// <username, <command, expiresAt>>
+const cooldowns = new HashMap<string, HashMap<string, number>>();
+const COOLDOWN_MS = 3000;
+
+cooldowns
+  .computeIfAbsent("Alice", () => new HashMap<string, number>())
+  .set("ping", Date.now() + COOLDOWN_MS);
+
+const expires = cooldowns.get("Alice")?.get("ping");
+console.log(expires !== undefined && expires > Date.now()); // true
+```
+
+### `DenseMap` — array-like utilities
+
+`DenseMap` maintains an internal array in parallel with the map, enabling familiar array-style operations.
+
+```ts
+import { DenseMap } from "@manoruchan/extended-map";
+
+const scores = new DenseMap<string, number>();
+scores.set("Alice", 80);
+scores.set("Bob", 45);
+scores.set("Carol", 92);
+
+// filter — returns a new DenseMap with entries that satisfy the predicate
+const passed = scores.filter((k, v) => v >= 50);
+// → { Alice: 80, Carol: 92 }
+
+// sweep — removes entries in-place that satisfy the predicate; returns removed entries
+const removed = scores.sweep((k, v) => v < 50);
+// → { Bob: 45 }   (removed from scores)
+
+// some / every
+scores.some((k, v) => v === 100); // false
+scores.every((k, v) => v >= 50);  // true
+```
+
+#### Swap-delete
+
+`DenseMap` uses **swap-delete** (O(1)) instead of splice (O(n)) for internal array removal. When an entry is deleted, the last element in the internal array is swapped into its slot, then the array is truncated.
+
+**Caveat:** Insertion order is **not preserved** after a deletion. If your code depends on iteration order (e.g. `forEach`, spreading to an array), be aware that the order may change whenever an entry is removed.
+
+```ts
+const m = new DenseMap<string, number>();
+m.set("a", 1);
+m.set("b", 2);
+m.set("c", 3);
+
+m.delete("a"); // "c" is swapped into "a"'s slot
+
+console.log([...m.values()]); // [3, 2]  — not [2, 3]
 ```
 
 ## License
+
 [MIT](https://github.com/Manoruchan/extended-map/blob/main/LICENSE)
