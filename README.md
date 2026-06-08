@@ -15,8 +15,6 @@
 | `DenseMap` | Extends `HashMap` with array-like utilities (`filter`, `sweep`, `some`, `every`) using swap-delete for O(1) removal |
 | `BoundedMap` | Extends `HashMap` with a configurable capacity limit |
 
-> **Note:** Unlike Java's `HashMap`, `null` is treated as a valid value in all three classes.
-
 ## Installation
 
 ```bash

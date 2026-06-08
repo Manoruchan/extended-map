@@ -1,4 +1,4 @@
-export class HashMap<K, V> {
+export class HashMap<K, V extends {}> {
     private _map: Map<K, V>;
 
     constructor(entries?: Iterable<[K, V]>) {

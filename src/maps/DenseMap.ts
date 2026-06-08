@@ -1,4 +1,4 @@
-export class DenseMap<K, V> {
+export class DenseMap<K, V extends {}> {
     private readonly _index: Map<K, number>;
     private readonly _keys: K[];
     private readonly _values: V[];
@@ -199,7 +199,7 @@ export class DenseMap<K, V> {
     merge(key: K, value: V, fn: (oldValue: V, newValue: V) => V | undefined): V | undefined {
         const index = this._index.get(key);
         const newValue = index !== undefined ? fn(this._values[index], value) : value;
-        if (newValue == undefined) {
+        if (newValue === undefined) {
             this.delete(key);
         } else {
             this.set(key, newValue);
@@ -340,12 +340,7 @@ export class DenseMap<K, V> {
     }
 
     keysArray(): K[] {
-        const result: K[] = [];
-        for (let i = 0; i < this._values.length; i++) {
-            const key = this._keys[i];
-            result.push(key);
-        }
-        return result;
+        return [...this._keys];
     }
 
     map<U>(fn: (value: V, key: K, map: this) => U): U[] {
@@ -380,27 +375,20 @@ export class DenseMap<K, V> {
     }
 
     valuesArray(): V[] {
-        const result: V[] = [];
-        for (let i = 0; i < this._values.length; i++) {
-            const value = this._values[i];
-            result.push(value);
-        }
-        return result;
+        return [...this._values];
     }
 
     /* Collection<K, V> */
 
     sweep(fn: (value: V, key: K, map: this) => boolean): DenseMap<K, V> {
         const result = new DenseMap<K, V>();
-        for (let i = 0; i < this._values.length; i++) {
+        for (let i = this._keys.length - 1; i >= 0; i--) {
             const key = this._keys[i];
             const value = this._values[i];
             if (fn(value, key, this)) {
                 result.set(key, value);
+                this.delete(key);
             }
-        }
-        for (const key of result.keys()) {
-            this.delete(key);
         }
         return result;
     }
