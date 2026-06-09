@@ -75,8 +75,8 @@ const cooldowns = new HashMap<string, HashMap<string, number>>();
 const COOLDOWN_MS = 3000;
 
 cooldowns
-  .computeIfAbsent("Alice", () => new HashMap<string, number>())
-  .set("ping", Date.now() + COOLDOWN_MS);
+    .computeIfAbsent("Alice", () => new HashMap<string, number>())
+    .set("ping", Date.now() + COOLDOWN_MS);
 
 const expires = cooldowns.get("Alice")?.get("ping");
 console.log(expires !== undefined && expires > Date.now()); // true
@@ -95,16 +95,16 @@ scores.set("Bob", 45);
 scores.set("Carol", 92);
 
 // filter — returns a new DenseMap with entries that satisfy the predicate
-const passed = scores.filter((k, v) => v >= 50);
+const passed = scores.filter(v => v >= 50);
 // → { Alice: 80, Carol: 92 }
 
 // sweep — removes entries in-place that satisfy the predicate; returns removed entries
-const removed = scores.sweep((k, v) => v < 50);
+const removed = scores.sweep(v => v < 50);
 // → { Bob: 45 }   (removed from scores)
 
 // some / every
-scores.some((k, v) => v === 100); // false
-scores.every((k, v) => v >= 50);  // true
+scores.some(v => v === 100); // false
+scores.every(v => v >= 50);  // true
 ```
 
 #### Swap-delete
